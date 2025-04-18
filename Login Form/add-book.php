@@ -1,0 +1,171 @@
+<?php
+
+session_start();
+
+// Ensure only logged-in admins can access this page
+if (!isset($_SESSION['email'])) {
+    header("Location: index.php");
+    exit(); 
+}
+
+include "config.php";
+
+include "func-category.php";  // Include helper functions for fetching books
+$categories = get_all_categories($conn);
+
+
+include "func-author.php";  // Include helper functions for fetching books
+$authors = get_all_authors($conn);
+ 
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Book</title>
+    <link rel="stylesheet" href="admin.css">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="admin_page.php">Admin</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.php">Store</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="add-book.php">Add Book</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="add-category.php">Add Category</a>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link" href="add-author.php">Add Author</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="logout.php">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <form action="php/add-book.php"
+         enctype="multipart/form-data"
+         class="shadow p-4 rounded mt-5"
+        style="width: 90%; max-width:50rem;"
+        method="post"
+        >
+            <h1 class="text-center pb-5 display-4 fs-3">
+                Add New Book
+            </h1>
+            <?php if (isset($_GET['error'])) { ?>
+                <div class="alert alert-danger" role="alert">
+                    <?= htmlspecialchars($_GET['error']); // Display the error message ?>
+                </div>
+            <?php } ?>
+
+            <?php if (isset($_GET['success'])) { ?>
+                <div class="alert alert-success" role="alert">
+                    <?= htmlspecialchars($_GET['success']); // Display the error message ?>
+                </div>
+            <?php } ?>
+                
+            <div class="mb-3">
+                <label class="form-label">Book Title</label>
+                <input type="text"
+                class="form-control"
+                name="book_title"  
+                >
+            </div>
+
+            
+
+            <div class="mb-3">
+                <label class="form-label">Book Description</label>
+                <input type="text"
+                class="form-control"
+                name="description_title"
+                >
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Book Author</label>
+                 
+                <select name="book_author" 
+                     class="form-control">
+                     <option value="0">
+                        Select author
+                     </option>
+                     <?php 
+                        if ($authors == 0) {
+
+                        } else{
+                        foreach ($authors as $author){ 
+                        ?>
+                        <option value="<?= $author['id']?>">
+                        <?= $author['name']?>
+                        </option>
+
+                        <?php }  }?>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Book Category</label>
+                <select name="book_category" 
+                     class="form-control">
+                     <option value="0">
+                        Select category
+                     </option>
+                     <?php 
+                        if ($categories == 0) {
+
+                        } else{
+                        foreach ($categories as $category){ 
+                        ?>
+                        <option value="<?= $category['id']?>">
+                        <?= $category['name']?>
+                        </option>
+
+                        <?php }  }?>
+                </select>
+            </div>
+
+            <div class= "mb-3">
+                <label class="form-label">Book Cover</label>
+                <input type="file"
+                class="form-control"
+                name="book_cover"
+                >
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">File</label>
+                <input type="file"
+                class="form-control"
+                name="file"
+                >
+            </div>
+
+            <button type="submit"
+            class="btn btn-primary">Add Book</button>
+        </form>
+
+    </div>
+
+</body>
+</html>
